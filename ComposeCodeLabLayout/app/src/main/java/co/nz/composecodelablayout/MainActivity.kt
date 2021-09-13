@@ -5,7 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
@@ -25,9 +27,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ComposeCodeLabLayoutTheme {
-                StaggeredGrid {
-                    topics.forEach { GridChip(text = it) }
-                }
+                Body()
             }
         }
     }
@@ -46,8 +46,10 @@ fun GridChip(modifier: Modifier = Modifier, text: String) {
         border = BorderStroke(width = Dp.Hairline, Color.Black),
         shape = RoundedCornerShape(4.dp),
     ) {
-        Row(modifier = Modifier.padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Box(
                 Modifier
                     .width(16.dp)
@@ -58,6 +60,15 @@ fun GridChip(modifier: Modifier = Modifier, text: String) {
             Text(modifier = modifier, text = text)
         }
 
+    }
+}
+
+@Composable
+fun Body(modifier: Modifier = Modifier) {
+    Row(modifier = modifier.horizontalScroll(rememberScrollState())) {
+        StaggeredGrid(rows = 5) {
+            topics.forEach { GridChip(text = it) }
+        }
     }
 }
 
@@ -124,9 +135,7 @@ fun StaggeredGrid(
 @Composable
 fun StaggeredGridPreview() {
     ComposeCodeLabLayoutTheme {
-        StaggeredGrid {
-            topics.forEach { GridChip(text = it) }
-        }
+        Body()
     }
 }
 
