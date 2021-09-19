@@ -22,7 +22,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,6 +46,9 @@ fun TodoScreen(
     onRemoveItem: (TodoItem) -> Unit,
 ) {
     Column {
+        TodoItemInputBackground(elevate = true) {
+            TodoInputItem(onAddItem)
+        }
         LazyColumn(
             modifier = Modifier.weight(1f),
             contentPadding = PaddingValues(top = 8.dp)
@@ -67,6 +72,34 @@ fun TodoScreen(
             Text("Add random item")
         }
     }
+}
+
+@Composable
+fun TodoInputItem(onItemComplete: (TodoItem) -> Unit) {
+    val (text, setText) = remember { mutableStateOf("") }
+    Row(modifier = Modifier.padding(16.dp)) {
+        TodoInputFieldText(
+            text = text,
+            setText = setText,
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 8.dp)
+        )
+        TodoEditButton(
+            onClick = {
+                onItemComplete(TodoItem(text))
+                setText("")
+            },
+            text = "Add",
+            modifier = Modifier.align(Alignment.CenterVertically),
+            enabled = text.isNotBlank()
+        )
+    }
+}
+
+@Composable
+fun TodoInputFieldText(modifier: Modifier = Modifier, text: String, setText: (String) -> Unit) {
+    TodoInputText(text = text, onTextChange = setText, modifier = modifier)
 }
 
 /**
@@ -118,5 +151,28 @@ fun PreviewTodoScreen() {
 @Composable
 fun PreviewTodoRow() {
     val todo = remember { generateRandomTodoItem() }
-    TodoRow(todo = todo, onItemClicked = {}, modifier = Modifier.fillMaxWidth())
+    Surface {
+        TodoRow(todo = todo, onItemClicked = {}, modifier = Modifier.fillMaxWidth())
+    }
+}
+
+@Preview
+@Composable
+fun PreviewTodoInputItem() {
+    Surface {
+        TodoItemInputBackground(elevate = true) {
+            TodoInputItem(onItemComplete = {})
+        }
+    }
+}
+
+@Preview
+@Composable
+fun TodoInputFieldTextPreview() {
+    val (text, setText) = remember { mutableStateOf("") }
+    Surface {
+        TodoItemInputBackground(elevate = true) {
+            TodoInputFieldText(text = text, setText = setText)
+        }
+    }
 }
