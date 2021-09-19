@@ -16,22 +16,44 @@
 
 package com.codelabs.state.todo
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 
 class TodoViewModel : ViewModel() {
 
-    private var _todoItems = MutableLiveData(listOf<TodoItem>())
-    val todoItems: LiveData<List<TodoItem>> = _todoItems
+//    private var _todoItems = MutableLiveData(listOf<TodoItem>())
+//    val todoItems: LiveData<List<TodoItem>> = _todoItems
+
+    private val currentEditingIndex = mutableStateOf(-1)
+
+    var todoItems = mutableStateListOf<TodoItem>()
+        private set
+
+    val currentEditingItem: TodoItem?
+        get() = if (currentEditingIndex.value == -1) null else todoItems[currentEditingIndex.value]
 
     fun addItem(item: TodoItem) {
-        _todoItems.value = _todoItems.value!! + listOf(item)
+        todoItems.add(item)
     }
 
     fun removeItem(item: TodoItem) {
-        _todoItems.value = _todoItems.value!!.toMutableList().also {
-            it.remove(item)
+        todoItems.remove(item)
+    }
+
+    fun onEditItemStarted(item: TodoItem) {
+        currentEditingIndex.value = todoItems.indexOf(item)
+    }
+
+    fun onItemChanged(item: TodoItem) {
+        val currentItem = requireNotNull(currentEditingItem)
+        require(currentItem.id == item.id) {
+            "You can only change an item with the same id as currentEditItem"
         }
+        todoItems[currentEditingIndex.value] = item
+    }
+
+    fun onEditItemCompleted() {
+        currentEditingIndex.value = -1
     }
 }

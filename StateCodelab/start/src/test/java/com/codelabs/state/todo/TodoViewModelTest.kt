@@ -16,6 +16,22 @@
 
 package com.codelabs.state.todo
 
+import com.codelabs.state.util.generateRandomTodoItem
+import org.junit.Assert.assertEquals
+import org.junit.Test
+
 class TodoViewModelTest {
-    // TODO: Write tests
+
+    @Test
+    fun `See if items are updated`() {
+        val viewModel = TodoViewModel()
+        val item1 = generateRandomTodoItem()
+        val item2 = generateRandomTodoItem()
+        viewModel.addItem(item1)
+        viewModel.addItem(item2)
+
+        viewModel.removeItem(item1)
+
+        assertEquals(viewModel.todoItems.value, listOf(item2))
+    }
 }
