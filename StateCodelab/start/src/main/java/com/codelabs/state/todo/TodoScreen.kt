@@ -77,29 +77,38 @@ fun TodoScreen(
 @Composable
 fun TodoInputItem(onItemComplete: (TodoItem) -> Unit) {
     val (text, setText) = remember { mutableStateOf("") }
-    Row(modifier = Modifier.padding(16.dp)) {
-        TodoInputFieldText(
-            text = text,
-            setText = setText,
-            modifier = Modifier
-                .weight(1f)
-                .padding(end = 8.dp)
-        )
-        TodoEditButton(
-            onClick = {
-                onItemComplete(TodoItem(text))
-                setText("")
-            },
-            text = "Add",
-            modifier = Modifier.align(Alignment.CenterVertically),
-            enabled = text.isNotBlank()
-        )
+    val (icon, setIcon) = remember { mutableStateOf(TodoIcon.Default) }
+    val isIconVisible = text.isNotBlank()
+    val submit = {
+        onItemComplete(TodoItem(text, icon))
+        setIcon(TodoIcon.Default)
+        setText("")
     }
-}
 
-@Composable
-fun TodoInputFieldText(modifier: Modifier = Modifier, text: String, setText: (String) -> Unit) {
-    TodoInputText(text = text, onTextChange = setText, modifier = modifier)
+    Column {
+        Row(modifier = Modifier.padding(16.dp)) {
+            TodoInputText(
+                text = text,
+                onTextChange = setText,
+                onImeAction = submit,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp)
+            )
+            TodoEditButton(
+                onClick = submit,
+                text = "Add",
+                modifier = Modifier.align(Alignment.CenterVertically),
+                enabled = text.isNotBlank()
+            )
+        }
+
+        if (isIconVisible) {
+            AnimatedIconRow(icon = icon, onIconChange = setIcon)
+        } else {
+            Spacer(modifier = Modifier.size(16.dp))
+        }
+    }
 }
 
 /**
@@ -172,7 +181,7 @@ fun TodoInputFieldTextPreview() {
     val (text, setText) = remember { mutableStateOf("") }
     Surface {
         TodoItemInputBackground(elevate = true) {
-            TodoInputFieldText(text = text, setText = setText)
+            TodoInputText(text = text, onTextChange = setText)
         }
     }
 }
